@@ -16,7 +16,7 @@ if (isset($_GET["coor"])) {
     $data = array(array("geom" => $_GET["coor"]));
     $geo = $_GET["coor"];
 
-    for ($dif = -2000; $dif < 0; $dif = $dif + 5) {
+    for ($dif = -200; $dif < 0; $dif = $dif + 1) {
 
         $result = pg_query($connect2, "SELECT ST_AsText(ST_Buffer(ST_GeomFromText('$geo'),$dif)) AS geom");
 
@@ -36,12 +36,12 @@ if (isset($_GET["coor"])) {
         $res = pg_fetch_all($result);
         $start = $res[0]['geom'];
     }
-    //echo json_encode(array(array("geom" => $start)));
+   //echo json_encode(array(array("geom" => $start)));
 
 
     $result = pg_query($connect2, "
 SELECT ST_AsText((g.gdump).geom) as geom FROM           
-(SELECT ST_Dump(ST_CollectionExtract(ST_DelaunayTriangles(ST_GeomFromText('$start'),0.0001,0),3)) AS gdump) AS g 
+(SELECT ST_Dump(ST_CollectionExtract(ST_DelaunayTriangles(ST_GeomFromText('$start'),0.000001,0),3)) AS gdump) AS g 
             ");
 
     $trian = pg_fetch_all($result);
