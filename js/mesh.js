@@ -103,6 +103,7 @@ Drutes.makeMesh = function(label) {
         });
 
         url = Drutes.dir + "query/pok.php?coor=" + polygon;
+        console.log(url);
         $.ajax({
             url: url,
         }).done(function(data) {

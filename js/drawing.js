@@ -19,7 +19,8 @@ Drutes.polygonDraw = function(label) {
     this.button.title = "Výběr polygonem";
 
     this.control = new ol.interaction.Draw({
-        features: Drutes.featureOverlay.getFeatures(),
+        //source: Drutes.vector.getSource(),    for snapping
+         features: Drutes.featureOverlay.getFeatures(),
         type: "Polygon"
     });
 

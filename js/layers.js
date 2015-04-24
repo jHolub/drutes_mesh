@@ -8,12 +8,16 @@ Drutes.vector = new ol.layer.Vector({
         stroke: new ol.style.Stroke({
             color: 'green',
             width: 1
+        }),
+        image: new ol.style.Circle({
+            radius: 2,
+            fill: new ol.style.Fill({
+                color: 'yellow'
+            })
         })
     })
 });
 Drutes.map.addLayer(Drutes.vector);
-
-
 
 
 Drutes.featureOverlay = new ol.FeatureOverlay({
