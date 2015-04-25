@@ -141,29 +141,84 @@
             });
             Drutes.map.addInteraction(Drutes.snap);
             
-            
-            
-            
-    geomFact = new jsts.geom.GeometryFactory();
+   
+//http://www.htmlgoodies.com/beyond/javascript/removing-elements-from-an-array-in-javascript.html   
+if (!Array.prototype.remove) {
+  Array.prototype.remove = function(val) {
+    var i = this.indexOf(val);
+         return i>-1 ? this.splice(i, 1) : [];
+  };
+}
 
-    points = new Array(300);
+var a = [1,2,3,2,4];
+var removedItems = a.remove(2); //a = [1,3,2,4],   removedItems = [2];
+
+var b = [1,2,3,2,4];
+removedItems     = b.remove(8); //b = [1,2,3,2,4], removedItems = [];
+   
+   
+   
+   
+            
+            
+ 
+    writer = new jsts.io.WKTWriter();
+    par = 0.6;
+    points = new Array(5000);
+    meshPoint = new Array();
+    meshBuffer = new Array();
     for (i=0; i<points.length; i++) {
         points[i] = new jsts.geom.Coordinate((10 * Math.random()) , (10 * Math.random()));
+        point = new jsts.geom.Point(points[i]);
+        meshPoint.push(point);    
+        meshBuffer.push(point.buffer(par));
     }
-    input = geomFact.createMultiPoint(points);
-    
-     console.log(input);   
-     
-    builder = new jsts.triangulate.DelaunayTriangulationBuilder();
+  
+     for (i=0; i<meshBuffer.length; i++) {
+      console.log(i);   
+         for (j = meshPoint.length -1 ; j >= 0; j--) {
+             if(meshPoint[j] != null){
+                if(i != j){
+                    inter = meshBuffer[i].intersection(meshPoint[j]);
+                    //Drutes.drawWKT(writer.write(meshBuffer[i]));
+                    
+                }
+             }
+            if(inter.coordinate){
+                //Drutes.drawWKT(writer.write(inter)); 
+                //console.log(inter);
+                meshPoint.remove(meshPoint[j]);
+                meshBuffer.remove(meshBuffer[j]);
+                //meshPoint[j] = null;
+                //console.log(meshPoint.length);
+            }
+        }
+     } 
+  
+console.log(meshPoint.length);
+pok = new Array();
+ for (j=0; j<meshPoint.length; j++) {
+    pok.push(meshPoint[j]);
+  Drutes.drawWKT(writer.write(meshPoint[j])); 
+ }
+
+
+
+
+ geomFact = new jsts.geom.GeometryFactory();
+input = new jsts.geom.MultiPoint(pok);
+ builder = new jsts.triangulate.DelaunayTriangulationBuilder();
     builder.setSites(input);
     vardelaunayResult = builder.getTriangles(geomFact);
-
     p = new jsts.io.WKTWriter();
     wkt = p.write(vardelaunayResult);
     pwkt = p.write(input);
     //Drutes.drawWKT(pwkt);
-    //Drutes.drawWKT(wkt);       
+    Drutes.drawWKT(wkt);  
+
    
+   
+   /*
    
    
    
@@ -184,10 +239,14 @@
     
     pp = a.intersection(input);
     
+    
+    
+    
+    
     //Drutes.drawWKT(p.write(intersection));
    // Drutes.drawWKT(p.write(pp));
 
-   
+   /*
     lines = new Array();
     for (i = 0; i <= 10; i = i + 1) {
 
@@ -199,7 +258,7 @@
    
    input = geomFact.createLineString(lines[3]);
    input1 = geomFact.createLineString(lines[2]);
-   res = new jsts.geom.MultiLineString([input,input1])
+   res = new jsts.geom.MultiLineString([input,input1]);
  
     //Drutes.drawWKT(p.write(input)); 
    // Drutes.drawWKT(p.write(res)); 
@@ -208,7 +267,7 @@
     cross = e.intersection(res);
    
     Drutes.drawWKT(p.write(cross)); 
-   
+   */
    
         </script>
         <script src="<?php echo \GLOBALVAR\ROOT; ?>/css/bootstrap3_3_2/js/bootstrap.min.js"></script>
