@@ -10,9 +10,9 @@ Drutes.vector = new ol.layer.Vector({
             width: 1
         }),
         image: new ol.style.Circle({
-            radius: 2,
+            radius: 3,
             fill: new ol.style.Fill({
-                color: 'yellow'
+                color: 'red'
             })
         })
     })

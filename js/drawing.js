@@ -20,13 +20,22 @@ Drutes.polygonDraw = function(label) {
 
     this.control = new ol.interaction.Draw({
         //source: Drutes.vector.getSource(),    for snapping
-         features: Drutes.featureOverlay.getFeatures(),
+        features: Drutes.featureOverlay.getFeatures(),
         type: "Polygon"
     });
 
     this.control.setActive(false);
 
     Drutes.map.addInteraction(this.control);
+
+    this.control.on('drawend', function(e) {
+        geometry = e.feature.getGeometry();
+        extend = geometry.getExtent();
+        coord = geometry.getCoordinates();
+        Drutes.createDomain(0.5, coord[0], extend);
+        
+        Drutes.featureOverlay.getFeatures().clear();
+    });
 
     this.activate = function() {
         this.button.className = this.buttonClass + " active";
@@ -179,7 +188,7 @@ Drutes.modifyVector = function(label) {
     this.button.innerHTML = this.label;
 
     this.button.id = this.id;
-    
+
     this.button.className = this.buttonClass;
 
     this.button.title = label;
@@ -202,7 +211,7 @@ Drutes.modifyVector = function(label) {
 
     this.deactivate = function() {
         this.control.setActive(false);
-        this.modify.setActive(false);  
+        this.modify.setActive(false);
         this.control.getFeatures().clear();
         this.button.className = this.buttonClass;
         this.active = false;
@@ -242,16 +251,16 @@ Drutes.deleteVector = function(label) {
     this.button.innerHTML = this.label;
 
     this.button.id = this.id;
-    
+
     this.button.className = this.buttonClass;
 
     this.button.title = label;
 
-    this.control = function(e){
+    this.control = function(e) {
         Drutes.map.forEachFeatureAtPixel(e.pixel, function(feature, layer) {
 
             Drutes.featureOverlay.removeFeature(feature);
-        });        
+        });
     }
 
     this.activate = function() {
