@@ -32,7 +32,7 @@ Drutes.polygonDraw = function(label) {
         geometry = e.feature.getGeometry();
         extend = geometry.getExtent();
         coord = geometry.getCoordinates();
-        Drutes.createDomain(0.5, coord[0], extend);
+        Drutes.createDomain(0.8, coord[0], extend);
         
         Drutes.featureOverlay.getFeatures().clear();
     });

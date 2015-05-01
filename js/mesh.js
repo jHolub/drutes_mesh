@@ -152,19 +152,19 @@ Drutes.createDomain = function(dif, coord, ext) {
     rad2deg = 180 / Math.PI;
     deg2rad = Math.PI / 180;
     // posun na primce
-    
+
     points = new Array();
-    
+
     for (i = 0; i < (coord.length - 1); i++) {
 
         x = coord[i + 1][0] - coord[i][0];
         y = coord[i + 1][1] - coord[i][1];
         Talfa = y / x;
         degrees = Math.atan(Talfa) * rad2deg;
-        
-       // Drutes.vector.getSource().addFeature(new ol.Feature(new ol.geom.Point([coord[i][0], coord[i][1]])));
+
+        // Drutes.vector.getSource().addFeature(new ol.Feature(new ol.geom.Point([coord[i][0], coord[i][1]])));
         points.push([coord[i][0], coord[i][1]]);
-        
+
         vectorLength = Math.pow((x * x) + (y * y), 0.5);
         step = 1;
         while ((dif * step) < vectorLength) {
@@ -183,16 +183,16 @@ Drutes.createDomain = function(dif, coord, ext) {
                 y_ = (coord[i][1]) + (Math.sin(Math.abs(degrees) * deg2rad) * (dif * step));
             }
             step++;
-            
+
             points.push([x_, y_]);
             //Drutes.vector.getSource().addFeature(new ol.Feature(new ol.geom.Point([x_, y_])));
         }
     }
-    
-    Drutes.createMesh(5000, dif, points, ext);
+
+    Drutes.createMesh(5000, dif, points, ext, coord);
 }
 
-Drutes.createMesh = function(density, radius, points, ext) {
+Drutes.createMesh = function(density, radius, points, ext, coord) {
 
     if (!Array.prototype.remove) {
         Array.prototype.remove = function(val) {
@@ -201,13 +201,36 @@ Drutes.createMesh = function(density, radius, points, ext) {
         };
     }
 
- //   points = new Array(density);
+    //   points = new Array(density);
 //generate points [x,y]
-    for (i = 0; i < density; i++) {
-        points.push([ 
-            ((ext[2] - ext[0]) * Math.random()) + ext[0], 
-            ((ext[3] - ext[1]) * Math.random()) + ext[1]
-        ]);
+    for (j = 0; j < density; j++) {
+
+        Xpoint = ((ext[2] - ext[0]) * Math.random()) + ext[0];
+        Ypoint = ((ext[3] - ext[1]) * Math.random()) + ext[1];
+
+        cross = 0;
+        for (i = 0; i < (coord.length - 1); i++) {
+// testovani zda se bod nachazi v prumetu linie na osu y
+            if ((coord[i + 1][1] < Ypoint) && (coord[i][1] < Ypoint)) {
+                continue;
+            } else if ((coord[i + 1][1] > Ypoint) && (coord[i][1] > Ypoint)) {
+                continue;
+            }
+
+//smernice primky
+            k = (coord[i + 1][1] - coord[i][1]) / (coord[i + 1][0] - coord[i][0]);
+// posun na ose y
+            q = coord[i][1] - (k * coord[i][0]);
+// prunik primek, 1. definovana bodem (rovnobezna s osou X) 2. definovana linii domeny
+            xCross = (Ypoint - q) / k;
+
+            if (Xpoint < xCross) {
+                cross++;
+            }
+        }
+        if ((cross % 2) != 0) {
+            points.push([Xpoint, Ypoint]);
+        }
     }
 // regular mesh            
     /*           points = new Array();
