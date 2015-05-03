@@ -18,8 +18,6 @@
 
         <script src="./lib/jquery/jquery-1.11.1.min.js"></script>
 
-        <script type="text/javascript" src="./lib/ol2.js"></script>
-
         <script type="text/javascript" src="./lib/jsts/jsts/lib/javascript.util.js"></script>
 
         <script type="text/javascript" src="./lib/jsts/jsts/lib/jsts.js"></script>
@@ -43,28 +41,26 @@
     <body>  
         <div id="map" class="map"></div>
         <div id="mousePosition"></div>
+        <div id="info"></div>
         <div id="tollBar"></div>
+        <div class="form-group">
+            <label for="density">Mesh density [0.1m - 5m]:</label>
+            <input type="number" value="0.7" class="form-control" id="density">
+        </div>
+        <div class="form-group">
+            <label for="cloudPoint">Number of cloud point [500 - 10 000]:</label>
+            <input type="number" value="5000" class="form-control" id="cloudPoint">
+        </div>     
+        <script>
+
+            Drutes = window.Drutes || {};
+            Drutes.dir = "./";
+
+        </script>
+        <script src="./js/grid.js"></script>         
         <script>
 
 
-            Drutes = window.Drutes || {};
-
-            Drutes.dir = "./";
-
-            Drutes.map = new ol.Map({
-                target: 'map',
-                controls: ol.control.defaults().extend([new ol.control.ScaleLine({units: 'metric'})]),
-                interactions: ol.interaction.defaults({doubleClickZoom: false}),
-                view: new ol.View({
-                    center: [5, 5],
-                    extent: [0, 0, 10, 10],
-                    maxResolution: 0.1,
-                    resolution: 0.1,
-                    zoom: 2,
-                    minZoom: 0,
-                    maxZoom: 3
-                })
-            });
 
             Drutes.mousePositionTemplate = 'X: {x}[m] Y: {y}[m]';
             Drutes.map.addControl(new ol.control.MousePosition({
@@ -76,73 +72,58 @@
                 undefinedHTML: '&nbsp;'
             }));
 
-
-            Drutes.setVyber = function(data) {
-
-
-                if (data != "" && data != null) {
-
-                    dat = jQuery.parseJSON(data);
-
-                    for (i = 0; i < dat.length; i++) {
-
-                        format = new ol.format.WKT();
-
-                        feature = format.readFeature(dat[i].geom);
-                        feature.setProperties({
-                            'id': ""
-                        });
-                        source = Drutes.vector.getSource();
-                        source.addFeature(feature);
-
-                        coor = feature.getGeometry().getCoordinates();
-
-                        //[x,y]
-                        a = Drutes.nodes.add(coor[0][0][0], coor[0][0][1]);
-                        b = Drutes.nodes.add(coor[0][1][0], coor[0][1][1]);
-                        c = Drutes.nodes.add(coor[0][2][0], coor[0][2][1]);
-                        Drutes.elements.add(a, b, c);
-                    }
-                }
-                Drutes.printMesh(Drutes.nodes.store, Drutes.elements.store);
-            };
-
             Drutes.drawWKT = function(wkt) {
 
                 format = new ol.format.WKT();
                 feature = format.readFeature(wkt);
+                polygons = feature.getGeometry().getGeometries();
                 source = Drutes.vector.getSource();
-                source.addFeature(feature);
-                Drutes.map.getView().fitExtent(source.getExtent(), Drutes.map.getSize());
+// from geometry collection to simplegeometry                
+                for (i = 0; i < polygons.length; i++) {
+                    console.log("rendering" + ( i / polygons.length ) );
+                    poly = new ol.Feature({
+                        geometry: polygons[i]
+                    });
+                    source.addFeature(poly);
+                    coor = polygons[i].getCoordinates();
+                        //[x,y]
+                        a = Drutes.nodes.add(coor[0][0][0], coor[0][0][1]);
+                        b = Drutes.nodes.add(coor[0][1][0], coor[0][1][1]);
+                        c = Drutes.nodes.add(coor[0][2][0], coor[0][2][1]);
+                        Drutes.elements.add(a, b, c);                    
+                }
+                Drutes.printMesh(Drutes.nodes.store, Drutes.elements.store);
             }
-
-
-
         </script>
         <script src="./js/drawing.js"></script>
         <script src="./js/drawPanel.js"></script>
-        <script src="./js/grid.js"></script>  
+
+        <script>Drutes.selector = new Drutes.selectVector('Select');</script>
+
         <script src="./js/mesh.js"></script> 
         <script src="./js/layers.js"></script>         
         <script>
+
+
             Drutes.toolBar(
                     [
-                        new Drutes.polygonDraw('Polygon'),
-                        new Drutes.pointDraw('Point'),
-                        new Drutes.lineDraw('Line'),
-                        new Drutes.modifyVector('Select - Modify'),
-                        new Drutes.deleteVector('Delete'),
-                        new Drutes.makeMesh('Create mesh')
+                        new Drutes.polygonDraw('Draw shape'),
+                        Drutes.selector,
+                        new Drutes.deleteVector('Delete selected feature')
+                    ],
+                    [
+                        new Drutes.modifyVector('Modify feature', Drutes.selector.control)
+                    ],
+                    [
+                        new Drutes.makeMesh('make mesh')
                     ]
                     );
 
             Drutes.snap = new ol.interaction.Snap({
-                source: Drutes.vector.getSource()
+                features: Drutes.featureOverlay.getFeatures()
             });
             Drutes.map.addInteraction(Drutes.snap);
-
         </script>
-        <script src="css/bootstrap3_3_2/js/bootstrap.min.js"></script>
     </body>
 
 </html>

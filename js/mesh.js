@@ -73,88 +73,14 @@ Drutes.elements = new function() {
 
 }();
 
-Drutes.makeMesh = function(label) {
-
-    this.button;
-
-    this.buttonClass = "createMesh btn btn-primary";
-
-    this.label = label;
-
-    this.button = document.createElement('div');
-
-    this.button.innerHTML = this.label;
-
-    this.button.id = this.id;
-
-    this.button.className = this.buttonClass;
-
-    this.button.title = label;
-
-    this.control = function() {
-
-        features = Drutes.featureOverlay.getFeatures();
-
-        features.forEach(function(feature) {
-            geometry = feature.getGeometry();
-            coord = geometry.getCoordinates();
-            wkt = new ol.format.WKT();
-            polygon = wkt.writeFeature(feature)
-        });
-
-        url = Drutes.dir + "query/pok.php?coor=" + polygon;
-        console.log(url);
-        $.ajax({
-            url: url,
-        }).done(function(data) {
-            Drutes.setVyber(data);
-        });
-
-    };
-
-
-    this.activate = function() {
-        this.button.className = this.buttonClass + " active";
-        this.active = true;
-        this.control();
-    }
-
-    this.deactivate = function() {
-        this.button.className = this.buttonClass;
-        this.active = false;
-    }
-
-    this.button.onclick = function(obj) {
-        return function() {
-            if (obj.button.className == obj.buttonClass) {
-                obj.activate();
-            } else {
-                obj.deactivate();
-            }
-        }
-    }(this)
-
-    this.isActive = function() {
-
-        return this.active;
-    }
-
-    this.render = function() {
-
-        return this.button;
-    }
-}
-
-
-Drutes.createDomain = function(dif, coord, ext) {
-
+Drutes.createDomain = function(coord, ext) {
+    // posun na primce
+    dif = $("#density").val();
     // prevod radian na stupne
     rad2deg = 180 / Math.PI;
     deg2rad = Math.PI / 180;
-    // posun na primce
 
     points = new Array();
-
     for (i = 0; i < (coord.length - 1); i++) {
 
         x = coord[i + 1][0] - coord[i][0];
@@ -189,10 +115,14 @@ Drutes.createDomain = function(dif, coord, ext) {
         }
     }
 
-    Drutes.createMesh(5000, dif, points, ext, coord);
+    return points;
 }
 
-Drutes.createMesh = function(density, radius, points, ext, coord) {
+Drutes.createMesh = function(points, coord, ext) {
+
+    radius = $("#density").val();
+
+    density = $("#cloudPoint").val();
 
     if (!Array.prototype.remove) {
         Array.prototype.remove = function(val) {
@@ -201,8 +131,9 @@ Drutes.createMesh = function(density, radius, points, ext, coord) {
         };
     }
 
-    //   points = new Array(density);
+    pointCloud = new Array();
 //generate points [x,y]
+// test: zda se vygenerovany bod na nachazi uvnitr domeny, Ray casting algorithm
     for (j = 0; j < density; j++) {
 
         Xpoint = ((ext[2] - ext[0]) * Math.random()) + ext[0];
@@ -229,29 +160,47 @@ Drutes.createMesh = function(density, radius, points, ext, coord) {
             }
         }
         if ((cross % 2) != 0) {
-            points.push([Xpoint, Ypoint]);
+            pointCloud.push([Xpoint, Ypoint]);
         }
     }
 // regular mesh            
     /*           points = new Array();
      for (x = 0; x < 10; x = x + 0.21) {
      for (y = 0; y < 10; y = y + 0.19) {
-     points.push([x, y]);
+     pointCloud.push([x, y]);
      }
      }
      */
-
+// odstraneni bodu v blizkosti domeny    
     for (i = 0; i < points.length; i++) {
-        // console.log(i);
-        for (j = i + 1; j < points.length; j++) {
+        for (j = 0; j < pointCloud.length; j++) {
+        // vzajemna poloha bodu a kruznice, m = (x' * x0)^2 + (y' * y0)^2 - r^2
+            m = Math.pow((pointCloud[j][0] - points[i][0]), 2) + Math.pow((pointCloud[j][1] - points[i][1]), 2) - Math.pow(radius, 2);
+        // bod lezi vne nebo na kruznici                    
+            if (m <= 0) {
+                pointCloud.remove(pointCloud[j]);
+                j--;
+            }    
+
+        }
+    }
+    
+// vyhlazeni bodu, body nachazejici se uvnitr kruznice se stredem daneho bodu jsou odstraneny
+    for (i = 0; i < pointCloud.length; i++) {
+        console.log("generating" + ( i / pointCloud.length) );
+        for (j = i + 1; j < pointCloud.length; j++) {
 // vzajemna poloha bodu a kruznice, m = (x' * x0)^2 + (y' * y0)^2 - r^2
-            m = Math.pow((points[j][0] - points[i][0]), 2) + Math.pow((points[j][1] - points[i][1]), 2) - Math.pow(radius, 2);
+            m = Math.pow((pointCloud[j][0] - pointCloud[i][0]), 2) + Math.pow((pointCloud[j][1] - pointCloud[i][1]), 2) - Math.pow(radius, 2);
 // bod lezi vne nebo na kruznici                    
             if (m <= 0) {
-                points.remove(points[j]);
+                pointCloud.remove(pointCloud[j]);
                 j--;
             }
         }
+    }
+// pridani bodu pro sit k domene
+    for (i = 0; i < pointCloud.length; i++) {
+        points.push(pointCloud[i]);
     }
 
     meshPoints = new Array();
@@ -266,12 +215,10 @@ Drutes.createMesh = function(density, radius, points, ext, coord) {
     builder = new jsts.triangulate.DelaunayTriangulationBuilder();
     builder.setSites(input);
     vardelaunayResult = builder.getTriangles(geomFact);
+
     p = new jsts.io.WKTWriter();
     wkt = p.write(vardelaunayResult);
-    pwkt = p.write(input);
-    // Drutes.drawWKT(pwkt);   
     Drutes.drawWKT(wkt);
-
 }
 
 Drutes.printMesh = function(nodes, elements) {
@@ -279,7 +226,7 @@ Drutes.printMesh = function(nodes, elements) {
     table = "";
     for (i = 0; i < nodes.length; i++) {
 
-        table = table + "<tr><td>" + i + ".index </td><td> X : " + nodes[i][0] + "</td><td> Y: " + nodes[i][1] + "</td></tr>";
+        table = table + "<tr><td>" + i + ".nodes </td><td> X : " + nodes[i][0] + "</td><td> Y: " + nodes[i][1] + "</td></tr>";
     }
     $("body").append("<table>" + table + "</table>");
 
@@ -289,4 +236,60 @@ Drutes.printMesh = function(nodes, elements) {
         table = table + "<tr><td>" + i + ".element </td><td> A : " + elements[i][0] + "</td><td> B: " + elements[i][1] + "</td><td> C: " + elements[i][2] + "</td></tr>";
     }
     $("body").append("<table>" + table + "</table>");
+}
+
+Drutes.makeMesh = function(label) {
+
+    this.button;
+
+    this.buttonClass = "ControlModify btn btn-primary";
+
+    this.label = label;
+
+    this.button = document.createElement('div');
+
+    this.button.innerHTML = this.label;
+
+    this.button.id = this.id;
+
+    this.button.className = this.buttonClass;
+
+    this.button.title = label;
+
+    this.activate = function() {
+        
+        feature = Drutes.selector.control.getFeatures();       
+        feature.forEach(function(e){
+        geometry = e.getGeometry();
+        extend = geometry.getExtent();
+        coord = geometry.getCoordinates();
+
+        domain = Drutes.createDomain(coord[0], extend);
+        Drutes.createMesh(domain, coord[0], extend);     
+        });
+     }
+
+    this.deactivate = function() {
+
+    }
+
+    this.button.onclick = function(obj) {
+        return function() {
+            if (obj.button.className == obj.buttonClass) {
+                obj.activate();
+            } else {
+                obj.deactivate();
+            }
+        }
+    }(this)
+
+    this.isActive = function() {
+
+        return this.active;
+    }
+
+    this.render = function() {
+
+        return this.button;
+    }
 }

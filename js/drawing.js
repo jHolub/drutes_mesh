@@ -29,12 +29,15 @@ Drutes.polygonDraw = function(label) {
     Drutes.map.addInteraction(this.control);
 
     this.control.on('drawend', function(e) {
-        geometry = e.feature.getGeometry();
+      /*  geometry = e.feature.getGeometry();
         extend = geometry.getExtent();
         coord = geometry.getCoordinates();
-        Drutes.createDomain(0.8, coord[0], extend);
-        
+
+        domain = Drutes.createDomain(coord[0], extend);
+        Drutes.createMesh(domain, coord[0], extend);
+
         Drutes.featureOverlay.getFeatures().clear();
+        */
     });
 
     this.activate = function() {
@@ -63,15 +66,11 @@ Drutes.polygonDraw = function(label) {
     }
 };
 
-
-
-Drutes.lineDraw = function(label) {
-
+Drutes.selectVector = function(label) {
+    
     this.button;
 
-    this.buttonClass = "ControlLine btn btn-primary";
-
-    this.id = "ControlLine";
+    this.buttonClass = "ControlModify btn btn-primary";
 
     this.label = label;
 
@@ -79,29 +78,27 @@ Drutes.lineDraw = function(label) {
 
     this.button.innerHTML = this.label;
 
-    this.button.className = this.buttonClass;
-
     this.button.id = this.id;
 
-    this.button.title = "Line";
+    this.button.className = this.buttonClass;
 
-    this.control = new ol.interaction.Draw({
-        features: Drutes.featureOverlay.getFeatures(),
-        type: "LineString"
-    });
+    this.button.title = label;
 
-    this.control.setActive(false);
+    this.control = new ol.interaction.Select({});
 
     Drutes.map.addInteraction(this.control);
 
     this.activate = function() {
         this.button.className = this.buttonClass + " active";
+        this.active = true;
         this.control.setActive(true);
     }
 
     this.deactivate = function() {
         this.control.setActive(false);
+        this.control.getFeatures().clear();
         this.button.className = this.buttonClass;
+        this.active = false;
     }
 
     this.button.onclick = function(obj) {
@@ -114,60 +111,10 @@ Drutes.lineDraw = function(label) {
         }
     }(this)
 
-    this.render = function() {
+    this.isActive = function() {
 
-        return this.button;
+        return this.active;
     }
-};
-
-Drutes.pointDraw = function(label) {
-
-    this.button;
-
-    this.buttonClass = "ControlPoint btn btn-primary";
-
-    this.id = "ControlPoint";
-
-    this.label = label;
-
-    this.button = document.createElement('div');
-
-    this.button.innerHTML = this.label;
-
-    this.button.className = this.buttonClass;
-
-    this.button.id = this.id;
-
-    this.button.title = "Point";
-
-    this.control = new ol.interaction.Draw({
-        features: Drutes.featureOverlay.getFeatures(),
-        type: "Point"
-    });
-
-    this.control.setActive(false);
-
-    Drutes.map.addInteraction(this.control);
-
-    this.activate = function() {
-        this.button.className = this.buttonClass + " active";
-        this.control.setActive(true);
-    }
-
-    this.deactivate = function() {
-        this.control.setActive(false);
-        this.button.className = this.buttonClass;
-    }
-
-    this.button.onclick = function(obj) {
-        return function() {
-            if (obj.button.className == obj.buttonClass) {
-                obj.activate();
-            } else {
-                obj.deactivate();
-            }
-        }
-    }(this)
 
     this.render = function() {
 
@@ -175,7 +122,7 @@ Drutes.pointDraw = function(label) {
     }
 };
 
-Drutes.modifyVector = function(label) {
+Drutes.modifyVector = function(label, selector) {
 
     this.button;
 
@@ -196,23 +143,18 @@ Drutes.modifyVector = function(label) {
     this.control = new ol.interaction.Select({});
 
     this.modify = new ol.interaction.Modify({
-        features: this.control.getFeatures()
+        features: selector.getFeatures()
     });
-
-    Drutes.map.addInteraction(this.control);
     Drutes.map.addInteraction(this.modify);
 
     this.activate = function() {
         this.button.className = this.buttonClass + " active";
         this.active = true;
-        this.control.setActive(true);
         this.modify.setActive(true);
     }
 
     this.deactivate = function() {
-        this.control.setActive(false);
         this.modify.setActive(false);
-        this.control.getFeatures().clear();
         this.button.className = this.buttonClass;
         this.active = false;
     }
