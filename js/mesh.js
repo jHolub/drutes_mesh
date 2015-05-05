@@ -242,7 +242,7 @@ Drutes.makeMesh = function(label) {
 
     this.button;
 
-    this.buttonClass = "ControlModify btn btn-primary";
+    this.buttonClass = "btn btn-primary  btn-block";
 
     this.label = label;
 
@@ -257,7 +257,7 @@ Drutes.makeMesh = function(label) {
     this.button.title = label;
 
     this.activate = function() {
-        
+  
         feature = Drutes.selector.control.getFeatures();       
         feature.forEach(function(e){
         geometry = e.getGeometry();

@@ -1,6 +1,7 @@
 Drutes.toolBar = function() {
 
     this.component = document.createElement("div");
+    
     this.component.id = "toolBar";
 
     this.groupControls = new Array();

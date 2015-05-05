@@ -27,34 +27,50 @@
             body{
                 margin: 0px;
                 padding: 0px;
+                width: 100%; 
+                height: 100%;                 
             }
 
             #map{
                 width: 100%; 
-                height: 500px; 
-                background-color: gray;
+                height: 100%; 
+                background-color: black;
             }
         </style>
 
     </head>
 
     <body>  
-        <div id="map" class="map"></div>
-        <div id="mousePosition"></div>
-        <div id="info"></div>
-        <div id="tollBar"></div>
-        <div class="form-group">
-            <label for="density">Mesh density [0.1m - 5m]:</label>
-            <input type="number" value="0.7" class="form-control" id="density">
-        </div>
-        <div class="form-group">
-            <label for="cloudPoint">Number of cloud point [500 - 10 000]:</label>
-            <input type="number" value="5000" class="form-control" id="cloudPoint">
-        </div>     
+
+            <div class="row">  
+                
+                <div class="col-md-8"> 
+                    <div id="map" class="map"></div>
+                    <div id="mousePosition"></div>
+                </div>
+                
+                <div class="col-md-4">                    
+                    <div id="info"></div>
+                    <div id="tollBar"></div>
+                    <div class="form-group">
+                        <label for="density">Mesh density [0.1m - 5m]:</label>
+                        <input type="number" value="0.7" class="form-control" id="density">
+                    </div>
+                    <div class="form-group">
+                        <label for="cloudPoint">Number of cloud point [500 - 10 000]:</label>
+                        <input type="number" value="5000" class="form-control" id="cloudPoint">
+                    </div> 
+                   <div id="creator"></div>
+                </div>
+                
+            </div>
+    
+
+
         <script>
 
             Drutes = window.Drutes || {};
-            Drutes.dir = "./";
+            Drutes.dir = "./";            
 
         </script>
         <script src="./js/grid.js"></script>         
@@ -80,17 +96,17 @@
                 source = Drutes.vector.getSource();
 // from geometry collection to simplegeometry                
                 for (i = 0; i < polygons.length; i++) {
-                    console.log("rendering" + ( i / polygons.length ) );
+                    console.log("rendering" + (i / polygons.length));
                     poly = new ol.Feature({
                         geometry: polygons[i]
                     });
                     source.addFeature(poly);
                     coor = polygons[i].getCoordinates();
-                        //[x,y]
-                        a = Drutes.nodes.add(coor[0][0][0], coor[0][0][1]);
-                        b = Drutes.nodes.add(coor[0][1][0], coor[0][1][1]);
-                        c = Drutes.nodes.add(coor[0][2][0], coor[0][2][1]);
-                        Drutes.elements.add(a, b, c);                    
+                    //[x,y]
+                    a = Drutes.nodes.add(coor[0][0][0], coor[0][0][1]);
+                    b = Drutes.nodes.add(coor[0][1][0], coor[0][1][1]);
+                    c = Drutes.nodes.add(coor[0][2][0], coor[0][2][1]);
+                    Drutes.elements.add(a, b, c);
                 }
                 Drutes.printMesh(Drutes.nodes.store, Drutes.elements.store);
             }
@@ -98,16 +114,20 @@
         <script src="./js/drawing.js"></script>
         <script src="./js/drawPanel.js"></script>
 
-        <script>Drutes.selector = new Drutes.selectVector('Select');</script>
+        <script>
+            Drutes.selector = new Drutes.selectVector();
+
+        </script>
 
         <script src="./js/mesh.js"></script> 
         <script src="./js/layers.js"></script>         
         <script>
 
-
             Drutes.toolBar(
                     [
-                        new Drutes.polygonDraw('Draw shape'),
+                        new Drutes.polygonDraw('Draw path'),
+                        new Drutes.lineDraw('Draw line'),
+                        new Drutes.pointDraw('Draw point'),
                         Drutes.selector,
                         new Drutes.deleteVector('Delete selected feature')
                     ],
@@ -115,7 +135,7 @@
                         new Drutes.modifyVector('Modify feature', Drutes.selector.control)
                     ],
                     [
-                        new Drutes.makeMesh('make mesh')
+                        new Drutes.makeMesh('make mesh')    
                     ]
                     );
 
@@ -123,6 +143,9 @@
                 features: Drutes.featureOverlay.getFeatures()
             });
             Drutes.map.addInteraction(Drutes.snap);
+            
+            creator = new Drutes.createPath();
+            creator.render('creator');
         </script>
     </body>
 
