@@ -1,40 +1,33 @@
-Drutes.vector = new ol.layer.Vector({
-    title: "",
+Drutes.pathLayer = new ol.layer.Vector({
+    title: "Path",
     source: new ol.source.Vector(),
     style: new ol.style.Style({
         fill: new ol.style.Fill({
-            color: 'rgba(255, 0, 0, 0.1)'
+            color: 'rgba(255, 255, 255, 0.2)'
         }),
+        stroke: new ol.style.Stroke({
+            color: 'rgba(255, 255, 255, 0.2)',
+            width: 1
+        })
+    })
+});
+
+Drutes.curveLayer = new ol.layer.Vector({
+    title: "Path",
+    source: new ol.source.Vector(),
+    style: new ol.style.Style({
         stroke: new ol.style.Stroke({
             color: 'green',
-            width: 1
-        }),
-        image: new ol.style.Circle({
-            radius: 3,
-            fill: new ol.style.Fill({
-                color: 'red'
-            })
-        })
-    })
-});
-Drutes.map.addLayer(Drutes.vector);
-
-
-Drutes.featureOverlay = new ol.FeatureOverlay({
-    style: new ol.style.Style({
-        fill: new ol.style.Fill({
-            color: 'rgba(255, 255, 255, 0)'
-        }),
-        stroke: new ol.style.Stroke({
-            color: '#ffcc33',
             width: 2
-        }),
-        image: new ol.style.Circle({
-            radius: 4,
-            fill: new ol.style.Fill({
-                color: '#ffcc33'
-            })
         })
     })
 });
-Drutes.featureOverlay.setMap(Drutes.map);
+
+Drutes.sketchLayer = new ol.layer.Vector({
+    title: "sketch",
+    source: new ol.source.Vector()
+});
+
+Drutes.map.addLayer(Drutes.pathLayer);
+Drutes.map.addLayer(Drutes.curveLayer);
+Drutes.map.addLayer(Drutes.sketchLayer);
