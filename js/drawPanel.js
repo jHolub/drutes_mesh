@@ -59,81 +59,6 @@ Drutes.polygonDraw = function(label) {
     }
 };
 
-Drutes.selectVector = function(depoId) {
-
-    this.button;
-
-    this.buttonClass = "btn btn-primary btn-block";
-
-    this.label = "Select feature (Shift+click to select multiple features)";
-
-    this.button = document.createElement('div');
-
-    this.button.innerHTML = this.label;
-
-    this.button.id = this.id;
-
-    this.button.className = this.buttonClass;
-
-    this.button.title = this.label;
-
-    this.depo = depoId;
-
-    this.control = new ol.interaction.Select({multi: false});
-
-    this_ = this;
-
-    this.control.on('select', function(e) {
-        feature = e.target.getFeatures();
-        $("#" + this_.depo).empty();
-        feature.forEach(function(e) {
-            key = e.getKeys();
-            for (i = 0; i < key.length; i++) {
-                val = e.get(key[i]);
-                $("#" + this_.depo).append(key[i] + ": " + val + "<br>");
-            }
-        });
-    });
-
-    Drutes.map.addInteraction(this.control);
-
-    this.activate = function() {
-        this.button.className = this.buttonClass + " active";
-        this.button.innerHTML = "Unselect feature";
-        this.active = true;
-        this.control.setActive(true);
-    }
-
-    this.deactivate = function() {
-        this.control.setActive(false);
-        this.button.innerHTML = this.label;
-        this.control.getFeatures().clear();
-        this.button.className = this.buttonClass;
-        this.active = false;
-        $("#" + this_.depo).empty();
-    }
-
-    this.button.onclick = function(obj) {
-        return function() {
-            if (obj.button.className == obj.buttonClass) {
-                obj.activate();
-            } else {
-                obj.deactivate();
-            }
-        }
-    }(this)
-
-    this.isActive = function() {
-
-        return this.active;
-    }
-
-    this.render = function() {
-
-        return this.button;
-    }
-};
-
 Drutes.deletePath = function(label) {
 
     this.button;
@@ -207,9 +132,13 @@ Drutes.createPath = function() {
     this.coord = new Array();
 
     this.feature = null;
-
+    this.inputXLabel = document.createElement('label');
+    this.inputXLabel.innerHTML = " Coordinates X: ";
     this.inputX = document.createElement('input');
     this.inputX.placeholder = 'X coor.';
+    
+    this.inputYLabel = document.createElement('label');
+    this.inputYLabel.innerHTML = "Coordinates Y: ";
     this.inputY = document.createElement('input');
     this.inputY.placeholder = 'Y coor.';
 
@@ -261,10 +190,23 @@ Drutes.createPath = function() {
         this.layer.addFeature(this.feature);
     }
 
-    var wrapper = document.createElement('div');
-    wrapper.innerHTML = "Create path: ";
-    wrapper.appendChild(this.inputX);
-    wrapper.appendChild(this.inputY);
+    var wrapper = document.createElement('fieldset');
+    wrapperLegend = document.createElement('legend');    
+    wrapperLegend.innerHTML = "Create path: ";
+    wrapper.appendChild(wrapperLegend);
+
+    wrapInputX = document.createElement('div');
+    wrapInputX.className = "form-group";
+    wrapInputX.appendChild(this.inputXLabel);
+    wrapInputX.appendChild(this.inputX);
+    wrapper.appendChild(wrapInputX);
+    
+    wrapInputY = document.createElement('div');
+    wrapInputY.className = "form-group";
+    wrapInputY.appendChild(this.inputYLabel);
+    wrapInputY.appendChild(this.inputY);
+    wrapper.appendChild(wrapInputY);
+
     wrapper.appendChild(addBtn);
     wrapper.appendChild(endBtn);
 
@@ -278,7 +220,7 @@ Drutes.addPath = function(path) {
 
     coord = path.getGeometry().getCoordinates();
     Drutes.pathColection.add();
-    path.setProperties({idPath: Drutes.pathColection.getIndex()});
+    path.setProperties({idPath: Drutes.pathColection.getIndex(), property: {}});
 
     for (i = 0; i < (coord[0].length - 1); i++) {
 

@@ -8,19 +8,15 @@
         <meta name="country" content="cz" />
         <meta http-equiv="content-language" content="cs" />
 
-        <link rel="stylesheet" href="./lib/OL_3.4.0/css/ol.css" type="text/javascript">
+        <link rel="stylesheet" href="./lib/OL_3.5.0/css/ol.css" type="text/javascript">
 
         <link rel="stylesheet" href="./lib/bootstrap3_3_2/css/bootstrap.min.css">
 
-        <script src="./lib/ol3/build/ol.js" type="text/javascript"></script>
+        <script src="./lib/OL_3.5.0/build/ol.js" type="text/javascript"></script>
 
         <script src="http://cdnjs.cloudflare.com/ajax/libs/proj4js/2.2.1/proj4.js" type="text/javascript"></script>
 
         <script src="./lib/jquery/jquery-1.11.1.min.js"></script>
-
-        <script type="text/javascript" src="./lib/jsts/jsts/lib/javascript.util.js"></script>
-
-        <script type="text/javascript" src="./lib/jsts/jsts/lib/jsts.js"></script>
 
         <style>
 
@@ -42,110 +38,64 @@
 
     <body>  
 
-            <div class="row">  
+        <div class="row">                
+            <div class="col-md-9"> 
                 
-                <div class="col-md-8"> 
-                    <div id="map" class="map"></div>
-                    <div id="mousePosition"></div>
-                </div>
-                
-                <div class="col-md-4">                    
-                    <div id="info"></div>
-                    <div id="tollBar"></div>
-                    <div class="form-group">
-                        <label for="density">Mesh density [0.1m - 5m]:</label>
-                        <input type="number" value="0.7" class="form-control" id="density">
-                    </div>
-                    <div class="form-group">
-                        <label for="cloudPoint">Number of cloud point [500 - 10 000]:</label>
-                        <input type="number" value="5000" class="form-control" id="cloudPoint">
-                    </div> 
-                   <div id="creator"></div>
-                </div>
-                
-            </div>
-    
+                <nav class="navbar navbar-default">
+                    <div class="container-fluid">
+                        <div id="naviCont">
 
+                        </div>
+                    </div>
+                </nav>
+
+
+                <div id="map" class="map"></div>
+                <div id="mousePosition"></div>
+            </div>                
+            <div class="col-md-3">                    
+                <div id="info"></div>
+                <div id="tollBar"></div>
+                <div id="creator"></div>
+                <div id="editProperty"></div>
+                <div id="selectedFeature"></div>
+            </div>                
+        </div>
 
         <script>
 
             Drutes = window.Drutes || {};
-            Drutes.dir = "./";            
+            Drutes.dir = "./";
 
         </script>
-        <script src="./js/grid.js"></script>         
-        <script>
-
-
-
-            Drutes.mousePositionTemplate = 'X: {x}[m] Y: {y}[m]';
-            Drutes.map.addControl(new ol.control.MousePosition({
-                coordinateFormat: function(coord) {
-                    return ol.coordinate.format(coord, Drutes.mousePositionTemplate, 3);
-                },
-                className: 'custom-mouse-position',
-                target: document.getElementById('mousePosition'),
-                undefinedHTML: '&nbsp;'
-            }));
-
-            Drutes.drawWKT = function(wkt) {
-
-                format = new ol.format.WKT();
-                feature = format.readFeature(wkt);
-                polygons = feature.getGeometry().getGeometries();
-                source = Drutes.vector.getSource();
-// from geometry collection to simplegeometry                
-                for (i = 0; i < polygons.length; i++) {
-                    console.log("rendering" + (i / polygons.length));
-                    poly = new ol.Feature({
-                        geometry: polygons[i]
-                    });
-                    source.addFeature(poly);
-                    coor = polygons[i].getCoordinates();
-                    //[x,y]
-                    a = Drutes.nodes.add(coor[0][0][0], coor[0][0][1]);
-                    b = Drutes.nodes.add(coor[0][1][0], coor[0][1][1]);
-                    c = Drutes.nodes.add(coor[0][2][0], coor[0][2][1]);
-                    Drutes.elements.add(a, b, c);
-                }
-                Drutes.printMesh(Drutes.nodes.store, Drutes.elements.store);
-            }
-        </script>
-        <script src="./js/drawing.js"></script>
-        <script src="./js/drawPanel.js"></script>
-
-        <script>
-            Drutes.selector = new Drutes.selectVector();
-
-        </script>
-
-        <script src="./js/mesh.js"></script> 
-        <script src="./js/layers.js"></script>         
+        <script src="./js/grid.js"></script>  
+        <script src="./js/canvas.js"></script> 
+        <script src="./js/layers.js"></script> 
+        <script src="./js/drawPanel.js"></script>      
+        <script src="./js/meshConfig.js"></script>     
+        <script src="./js/naviPanel.js"></script>             
         <script>
 
             Drutes.toolBar(
                     [
                         new Drutes.polygonDraw('Draw path'),
-                        new Drutes.lineDraw('Draw line'),
-                        new Drutes.pointDraw('Draw point'),
-                        Drutes.selector,
-                        new Drutes.deleteVector('Delete selected feature')
-                    ],
-                    [
-                        new Drutes.modifyVector('Modify feature', Drutes.selector.control)
-                    ],
-                    [
-                        new Drutes.makeMesh('make mesh')    
+                        new Drutes.deletePath('Delete path')
                     ]
                     );
 
             Drutes.snap = new ol.interaction.Snap({
-                features: Drutes.featureOverlay.getFeatures()
+                source: Drutes.pathLayer.getSource()
             });
             Drutes.map.addInteraction(Drutes.snap);
+
+            new Drutes.createPath().render('creator');
+            new Drutes.makePathProperty('selectedFeature').renderTo('editProperty');
+            new Drutes.makeCurveProperty('selectedFeature').renderTo('editProperty');
             
-            creator = new Drutes.createPath();
-            creator.render('creator');
+            new Drutes.makeConfigMesh('config maker').renderTo('naviCont');
+            new Drutes.makeConfigMesh('Save feature').renderTo('naviCont');
+            new Drutes.makeConfigMesh('Load feature').renderTo('naviCont');
+
         </script>
     </body>
 

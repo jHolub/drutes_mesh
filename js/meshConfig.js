@@ -135,44 +135,59 @@ Drutes.pathColection = new function() {
 
 }();
 
+Drutes.makeCurveProperty = function(depoId) {
 
-Drutes.makeProperty = function() {
+    this.depo = depoId;
 
-    this.buttonClass = "btn btn-primary  btn-block";
-    
+    this.buttonClass = "btn btn-primary";
 
     this.buttonSelect = document.createElement('div');
 
-    this.buttonSelect.innerHTML = 'Select path';
+    this.buttonSelect.innerHTML = 'Select curve';
 
     this.buttonSelect.className = this.buttonClass;
-  
-    this.buttonClass = "btn btn-primary  btn-block";
+
+    this.buttonClass = "btn btn-primary";
 
     this.button = document.createElement('div');
 
-    this.button.innerHTML = 'Set';
+    this.button.innerHTML = 'Set property';
 
     this.button.className = this.buttonClass;
-  
+
     var this_ = this;
-    
-    this.button.onclick = function(){
-        
-        this_.selectEvent.getFeatures().forEach(function(feature){
 
-                feature.setProperties({property: {}});
-                //this.inputName.value: this.inputValue.value
-                //feature.prototype.property = {name: 'value'};
-                console.log(feature);
-            }, this_);
-    };    
-        
-   this.selectEvent = new ol.interaction.Select();
-   this.selectEvent.setActive(false); 
-   Drutes.map.addInteraction(this.selectEvent);
+    this.button.onclick = function() {
 
-   this.activate = function() {
+        this_.selectEvent.getFeatures().forEach(function(feature) {
+
+            property = feature.get('property');
+            property[this.inputName.value] = this.inputValue.value;
+            this.renderProperty(feature.get('idPath'), feature.get('property'));
+        }, this_);
+    };
+
+    this.renderProperty = function(id, obj) {
+        
+        $("#" + this.depo).empty();
+        $("#" + this.depo).append("idCurve: " + id + "<br>");
+        for (key in obj) {
+            $("#" + this.depo).append(key + ": " + obj[key] + "<br>");
+        }
+    }
+
+    this.selectEvent = new ol.interaction.Select({layers: [Drutes.curveLayer]});
+    this.selectEvent.setActive(false);
+    Drutes.map.addInteraction(this.selectEvent);
+
+    this.selectEvent.on('select', function(e) {
+        e.target.getFeatures().forEach(function(feature) {
+
+            this.renderProperty(feature.get('idPath'), feature.get('property'));
+        }, this_);
+    });
+
+    this.activate = function() {
         this.buttonSelect.className = this.buttonClass + " active";
         this.selectEvent.setActive(true);
     }
@@ -181,6 +196,7 @@ Drutes.makeProperty = function() {
         this.selectEvent.setActive(false);
         this.selectEvent.getFeatures().clear();
         this.buttonSelect.className = this.buttonClass;
+        $("#" + this.depo).empty();
     }
 
     this.buttonSelect.onclick = function(obj) {
@@ -193,24 +209,42 @@ Drutes.makeProperty = function() {
         }
     }(this)
 
-
+    this.inputNameLabel = document.createElement('label');
+    this.inputNameLabel.innerHTML = "Name: ";    
     this.inputName = document.createElement('input');
-
     this.inputName.type = "text";
-
     this.inputName.placeholder = "name of property";
 
+    this.inputValueLabel = document.createElement('label');
+    this.inputValueLabel.innerHTML = "Value: ";   
     this.inputValue = document.createElement('input');
-
     this.inputValue.type = "number";
-
     this.inputValue.placeholder = "value";
+    
+    
+    var wrapper = document.createElement('fieldset');
+    wrapperLegend = document.createElement('legend');    
+    wrapperLegend.innerHTML = "Create path: ";
+    wrapper.appendChild(wrapperLegend);
+    
+    this.container = document.createElement('fieldset');
+    wrapperLegend = document.createElement('legend');    
+    wrapperLegend.innerHTML = "Set curve property: ";
+    this.container.appendChild(wrapperLegend);;
 
-    this.container = document.createElement('div');
-    this.container.innerHTML = 'Set property: ';
+
+    wrapInputName = document.createElement('div');
+    wrapInputName.className = "form-group";
+    wrapInputName.appendChild(this.inputNameLabel);
+    wrapInputName.appendChild(this.inputName);
+    this.container.appendChild(wrapInputName);
+    
+    wrapInputValue = document.createElement('div');
+    wrapInputValue.className = "form-group";
+    wrapInputValue.appendChild(this.inputValueLabel);
+    wrapInputValue.appendChild(this.inputValue);
+    this.container.appendChild(wrapInputValue);
     this.container.appendChild(this.buttonSelect);
-    this.container.appendChild(this.inputName);
-    this.container.appendChild(this.inputValue);
     this.container.appendChild(this.button);
 
     this.renderTo = function(id) {
@@ -219,44 +253,73 @@ Drutes.makeProperty = function() {
     }
 }
 
-Drutes.makeConfigMesh = function(label) {
+Drutes.makePathProperty = function(depoId) {
 
-    this.button;
+    this.depo = depoId;
 
-    this.buttonClass = "btn btn-primary  btn-block";
+    this.buttonClass = "btn btn-primary";
 
-    this.label = label;
+    this.buttonSelect = document.createElement('div');
+
+    this.buttonSelect.innerHTML = 'Select path';
+
+    this.buttonSelect.className = this.buttonClass;
+
+    this.buttonClass = "btn btn-primary";
 
     this.button = document.createElement('div');
 
-    this.button.innerHTML = this.label;
-
-    this.button.id = this.id;
+    this.button.innerHTML = 'Set property';
 
     this.button.className = this.buttonClass;
 
-    this.button.title = label;
+    var this_ = this;
+
+    this.button.onclick = function() {
+
+        this_.selectEvent.getFeatures().forEach(function(feature) {
+
+            property = feature.get('property');
+            property[this.inputName.value] = this.inputValue.value;
+            this.renderProperty(feature.get('idPath'), feature.get('property'));
+        }, this_);
+    };
+
+    this.renderProperty = function(id, obj) {
+        
+        $("#" + this.depo).empty();
+        $("#" + this.depo).append("idPath: " + id + "<br>");
+        for (key in obj) {
+            $("#" + this.depo).append(key + ": " + obj[key] + "<br>");
+        }
+    }
+
+    this.selectEvent = new ol.interaction.Select({layers: [Drutes.pathLayer]});
+    this.selectEvent.setActive(false);
+    Drutes.map.addInteraction(this.selectEvent);
+
+    this.selectEvent.on('select', function(e) {
+        e.target.getFeatures().forEach(function(feature) {
+
+            this.renderProperty(feature.get('idPath'), feature.get('property'));
+        }, this_);
+    });
 
     this.activate = function() {
-
-        Drutes.curveLayer.getSource().forEachFeature(function(e) {
-
-            coord = e.getGeometry().getCoordinates();
-            Drutes.curveColection.add(
-                    Drutes.vertexColection.add(coord[0][0], coord[0][1], e.get('property')),
-                    Drutes.vertexColection.add(coord[1][0], coord[1][1], e.get('property')),
-                    {idPath: e.get('idPath'), property: e.get('property')}
-            );
-        });
+        this.buttonSelect.className = this.buttonClass + " active";
+        this.selectEvent.setActive(true);
     }
 
     this.deactivate = function() {
-
+        this.selectEvent.setActive(false);
+        this.selectEvent.getFeatures().clear();
+        this.buttonSelect.className = this.buttonClass;
+        $("#" + this.depo).empty();
     }
 
-    this.button.onclick = function(obj) {
+    this.buttonSelect.onclick = function(obj) {
         return function() {
-            if (obj.button.className == obj.buttonClass) {
+            if (obj.buttonSelect.className == obj.buttonClass) {
                 obj.activate();
             } else {
                 obj.deactivate();
@@ -264,13 +327,46 @@ Drutes.makeConfigMesh = function(label) {
         }
     }(this)
 
-    this.isActive = function() {
+    this.inputNameLabel = document.createElement('label');
+    this.inputNameLabel.innerHTML = "Name: ";    
+    this.inputName = document.createElement('input');
+    this.inputName.type = "text";
+    this.inputName.placeholder = "name of property";
 
-        return this.active;
-    }
+    this.inputValueLabel = document.createElement('label');
+    this.inputValueLabel.innerHTML = "Value: ";   
+    this.inputValue = document.createElement('input');
+    this.inputValue.type = "number";
+    this.inputValue.placeholder = "value";
+    
+    
+    var wrapper = document.createElement('fieldset');
+    wrapperLegend = document.createElement('legend');    
+    wrapperLegend.innerHTML = "Create path: ";
+    wrapper.appendChild(wrapperLegend);
+    
+    this.container = document.createElement('fieldset');
+    wrapperLegend = document.createElement('legend');    
+    wrapperLegend.innerHTML = "Set path property: ";
+    this.container.appendChild(wrapperLegend);;
 
-    this.render = function() {
 
-        return this.button;
+    wrapInputName = document.createElement('div');
+    wrapInputName.className = "form-group";
+    wrapInputName.appendChild(this.inputNameLabel);
+    wrapInputName.appendChild(this.inputName);
+    this.container.appendChild(wrapInputName);
+    
+    wrapInputValue = document.createElement('div');
+    wrapInputValue.className = "form-group";
+    wrapInputValue.appendChild(this.inputValueLabel);
+    wrapInputValue.appendChild(this.inputValue);
+    this.container.appendChild(wrapInputValue);
+    this.container.appendChild(this.buttonSelect);
+    this.container.appendChild(this.button);
+
+    this.renderTo = function(id) {
+
+        document.getElementById(id).appendChild(this.container);
     }
 }
