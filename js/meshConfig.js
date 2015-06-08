@@ -156,7 +156,7 @@ Drutes.makeCurveProperty = function(depoId) {
     this.button.className = this.buttonClass;
 
     var this_ = this;
-
+/*
     this.button.onclick = function() {
 
         this_.selectEvent.getFeatures().forEach(function(feature) {
@@ -166,7 +166,7 @@ Drutes.makeCurveProperty = function(depoId) {
             this.renderProperty(feature.get('idPath'), feature.get('property'));
         }, this_);
     };
-
+*/
     this.renderProperty = function(id, obj) {
         
         $("#" + this.depo).empty();

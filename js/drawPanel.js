@@ -136,7 +136,7 @@ Drutes.createPath = function() {
     this.inputXLabel.innerHTML = " Coordinates X: ";
     this.inputX = document.createElement('input');
     this.inputX.placeholder = 'X coor.';
-    
+
     this.inputYLabel = document.createElement('label');
     this.inputYLabel.innerHTML = "Coordinates Y: ";
     this.inputY = document.createElement('input');
@@ -191,7 +191,7 @@ Drutes.createPath = function() {
     }
 
     var wrapper = document.createElement('fieldset');
-    wrapperLegend = document.createElement('legend');    
+    wrapperLegend = document.createElement('legend');
     wrapperLegend.innerHTML = "Create path: ";
     wrapper.appendChild(wrapperLegend);
 
@@ -200,7 +200,7 @@ Drutes.createPath = function() {
     wrapInputX.appendChild(this.inputXLabel);
     wrapInputX.appendChild(this.inputX);
     wrapper.appendChild(wrapInputX);
-    
+
     wrapInputY = document.createElement('div');
     wrapInputY.className = "form-group";
     wrapInputY.appendChild(this.inputYLabel);
@@ -217,7 +217,7 @@ Drutes.createPath = function() {
 }
 
 Drutes.addPath = function(path) {
-
+/*
     coord = path.getGeometry().getCoordinates();
     Drutes.pathColection.add();
     path.setProperties({idPath: Drutes.pathColection.getIndex(), property: {}});
@@ -240,6 +240,31 @@ Drutes.addPath = function(path) {
         );
 
     }
+*/
+
+
+    coord = path.getGeometry().getCoordinates();
+    curves = new Array();
+    
+    for (i = 0; i < (coord[0].length - 1); i++) {
+        a = new Drutes.vertexObj(coord[0][i][0], coord[0][i][1]);
+        b = new Drutes.vertexObj(coord[0][i + 1][0], coord[0][i + 1][1]);
+        
+        curve = new Drutes.curveObj(a,b);
+        curves.push(curve);
+        curveGeom = new ol.geom.LineString([coord[0][i], coord[0][i + 1]]);
+        curveFeature = new ol.Feature({geometry: curveGeom});
+        curveFeature.setProperties({
+            idCurve: curve.id,
+            property: {}
+        });
+        Drutes.curveLayer.getSource().addFeature(curveFeature);    
+        
+    }    
+    pathObj = new Drutes.pathObj(curves);
+    path.setProperties({idPath: pathObj.id, property: {}});
+    
+    console.log(Drutes.pathCollect);
 };
 
 Drutes.toolBar = function() {

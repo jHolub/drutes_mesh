@@ -61,7 +61,10 @@
                 <div id="selectedFeature"></div>
             </div>                
         </div>
-
+        <div>Use Alt+Shift+drag to rotate</div>
+        <div id="import"></div>
+        <div id="configResult"></div>
+        
         <script>
 
             Drutes = window.Drutes || {};
@@ -73,7 +76,9 @@
         <script src="./js/layers.js"></script> 
         <script src="./js/drawPanel.js"></script>      
         <script src="./js/meshConfig.js"></script>     
-        <script src="./js/naviPanel.js"></script>             
+        <script src="./js/naviPanel.js"></script>    
+        <script src="./js/import.js"></script> 
+        <script src="./js/vectorObj.js"></script> 
         <script>
 
             Drutes.toolBar(
@@ -94,7 +99,8 @@
             
             new Drutes.makeConfigMesh('config maker').renderTo('naviCont');
             new Drutes.makeConfigMesh('Save feature').renderTo('naviCont');
-            new Drutes.makeConfigMesh('Load feature').renderTo('naviCont');
+            new Drutes.makeConfigMesh('Load feature').renderTo('naviCont');            
+            new Drutes.importComp().renderTo('import');
 
         </script>
     </body>
