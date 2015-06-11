@@ -263,8 +263,7 @@ Drutes.addPath = function(path) {
     }    
     pathObj = new Drutes.pathObj(curves);
     path.setProperties({idPath: pathObj.id, property: {}});
-    
-    console.log(Drutes.pathCollect);
+
 };
 
 Drutes.toolBar = function() {

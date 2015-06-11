@@ -37,17 +37,17 @@
     </head>
 
     <body>  
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <div id="naviCont">
 
+                </div>
+            </div>
+        </nav>
         <div class="row">                
             <div class="col-md-9"> 
-                
-                <nav class="navbar navbar-default">
-                    <div class="container-fluid">
-                        <div id="naviCont">
 
-                        </div>
-                    </div>
-                </nav>
+
 
 
                 <div id="map" class="map"></div>
@@ -64,7 +64,7 @@
         <div>Use Alt+Shift+drag to rotate</div>
         <div id="import"></div>
         <div id="configResult"></div>
-        
+
         <script>
 
             Drutes = window.Drutes || {};
@@ -80,28 +80,28 @@
         <script src="./js/import.js"></script> 
         <script src="./js/vectorObj.js"></script> 
         <script>
+            $(document).ready(function() {
+                Drutes.toolBar(
+                        [
+                            new Drutes.polygonDraw('Draw path'),
+                            new Drutes.deletePath('Delete path')
+                        ]
+                        );
 
-            Drutes.toolBar(
-                    [
-                        new Drutes.polygonDraw('Draw path'),
-                        new Drutes.deletePath('Delete path')
-                    ]
-                    );
+                Drutes.snap = new ol.interaction.Snap({
+                    source: Drutes.pathLayer.getSource()
+                });
+                Drutes.map.addInteraction(Drutes.snap);
 
-            Drutes.snap = new ol.interaction.Snap({
-                source: Drutes.pathLayer.getSource()
+                new Drutes.createPath().render('creator');
+                new Drutes.makePathProperty('selectedFeature').renderTo('editProperty');
+                new Drutes.makeCurveProperty('selectedFeature').renderTo('editProperty');
+
+                new Drutes.makeConfigMesh('config maker').renderTo('naviCont');
+                new Drutes.makeConfigMesh('Save feature').renderTo('naviCont');
+                new Drutes.makeConfigMesh('Load feature').renderTo('naviCont');
+                new Drutes.importComp().renderTo('import');
             });
-            Drutes.map.addInteraction(Drutes.snap);
-
-            new Drutes.createPath().render('creator');
-            new Drutes.makePathProperty('selectedFeature').renderTo('editProperty');
-            new Drutes.makeCurveProperty('selectedFeature').renderTo('editProperty');
-            
-            new Drutes.makeConfigMesh('config maker').renderTo('naviCont');
-            new Drutes.makeConfigMesh('Save feature').renderTo('naviCont');
-            new Drutes.makeConfigMesh('Load feature').renderTo('naviCont');            
-            new Drutes.importComp().renderTo('import');
-
         </script>
     </body>
 

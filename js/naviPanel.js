@@ -15,34 +15,11 @@ Drutes.makeConfigMesh = function(label) {
     this.button.className = this.buttonClass;
 
     this.button.title = label;
+    
+    var this_ = this;
 
     this.button.onclick = function() {
-        /*
-         Drutes.curveLayer.getSource().forEachFeature(function(e) {
-         
-         coord = e.getGeometry().getCoordinates();
-         Drutes.curveColection.add(
-         Drutes.vertexColection.add(coord[0][0], coord[0][1], e.get('property')),
-         Drutes.vertexColection.add(coord[1][0], coord[1][1], e.get('property')),
-         {idPath: e.get('idPath'), property: e.get('property')}
-         );
-         });
-         */
 
-// init colekce vertex, curve a path, funkce Drutes.addPath-drawPanel.js odstranit init vertex a curve
-        /*   
-         res = "<br>";
-         for(i = 0; i < Drutes.vertexColection.vertex.length; i++){
-         
-         res += "vertex " + i + " xyz " + Drutes.vertexColection.vertex[i][0] + " " + Drutes.vertexColection.vertex[i][1] + " 0<br>";    
-         }
-         
-         res += "<br>";
-         for(i = 0; i < Drutes.curveColection.curve.length; i++){
-         
-         res += "curve " + i + " vertex " + Drutes.curveColection.curve[i][0] + " " + Drutes.curveColection.curve[i][1] + "<br>";    
-         }    
-         */
         res = "<br>";
 
         for (j = 0; j < Drutes.vertexCollect.collect.length; j++) {
@@ -53,18 +30,34 @@ Drutes.makeConfigMesh = function(label) {
 
         for (j = 0; j < Drutes.curveCollect.collect.length; j++) {
 
-            res += "curve " + Drutes.curveCollect.collect[j].id + " vertex " + Drutes.curveCollect.collect[j].a.id + "  " + Drutes.curveCollect.collect[j].b.id + "<br>";
+            res += "curve " + Drutes.curveCollect.collect[j].id + " vertex " + Drutes.curveCollect.collect[j].a.id + "  " + Drutes.curveCollect.collect[j].b.id + this_.printProperty(Drutes.curveCollect.collect[j].property) + "<br>";
         }
 
         for (j = 0; j < Drutes.pathCollect.collection.length; j++) {
+            
             res+= "<br>" + "path " + Drutes.pathCollect.collection[j].id + " normal 0 0 1 boundary curve "
+            
             for (i = 0; i < Drutes.pathCollect.collection[j].curves.length; i++) {
+                
                 res +=  " " + Drutes.pathCollect.collection[j].curves[i].id;
             }
+            res += this_.printProperty(Drutes.pathCollect.collection[j].property);
         }
 
         document.getElementById('configResult').innerHTML = res;
 
+    }
+    
+    this.printProperty = function(proper){
+        
+        res = "";
+        
+        for(key in proper){
+            
+            res += " " + key + " " + proper[key]; 
+        }
+        
+        return res;
     }
 
     this.renderTo = function(id) {

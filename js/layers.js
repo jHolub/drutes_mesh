@@ -18,7 +18,7 @@ Drutes.curveLayer = new ol.layer.Vector({
     style: new ol.style.Style({
         stroke: new ol.style.Stroke({
             color: 'yellow',
-            width: 3
+            width: 4
         })
     })
 });

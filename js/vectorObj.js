@@ -7,6 +7,11 @@ Drutes.pathCollect = new function() {
     this.add = function(path) {
         this.collection[this.index] = path;
         this.index++;
+    };
+    
+    this.get = function(id){
+        
+        return this.collection[id];
     }
 }();
 
@@ -14,8 +19,12 @@ Drutes.pathObj = function(curves) {
 
     this.curves = curves;
 
+    this.property = {};
+
     this.index = 0;
+    
     this.id = Drutes.pathCollect.index;
+    
     Drutes.pathCollect.add(this);    
 }
 
@@ -23,11 +32,19 @@ Drutes.pathObj = function(curves) {
 Drutes.curveCollect = new function() {
 
     this.collect = new Array();
+    
     this.index = 0;
+    
     this.add = function(curve) {
         this.collect[this.index] = curve;
         this.index++;
-    }
+    };
+    
+    this.get = function(id){
+        
+        return this.collect[id];
+    }; 
+    
 }();
 
 Drutes.curveObj = function(a, b) {
@@ -35,6 +52,8 @@ Drutes.curveObj = function(a, b) {
     this.a = a;
 
     this.b = b;
+    
+    this.property = {};
 
     this.isIn = function(a, b) {
         for (var i = 0; i < Drutes.curveCollect.collect.length; i++) {
@@ -102,35 +121,3 @@ Drutes.vertexObj = function(x, y) {
         return isIn;
     }
 }
-
-/*
-linea = new Drutes.curveObj(
-        new Drutes.vertexObj(1, 2),
-        new Drutes.vertexObj(2, 3)
-        );
-
-
-lineb = new Drutes.curveObj(
-        new Drutes.vertexObj(2, 3),
-        new Drutes.vertexObj(2, 5)
-        );
-
-
-linec = new Drutes.curveObj(
-        new Drutes.vertexObj(2, 5),
-        new Drutes.vertexObj(2, 3)
-        );
-
-
-lined = new Drutes.curveObj(
-        new Drutes.vertexObj(2, 5),
-        new Drutes.vertexObj(2, 3)
-        );
-path = new Drutes.pathObj([linea,lineb,linec,lined]);
-
-new Drutes.vertexObj(2, 3);
-new Drutes.vertexObj(10, 3);
-
-console.log(Drutes.pathCollect);
-
-*/
