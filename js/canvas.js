@@ -7,8 +7,8 @@ Drutes.map = new ol.Map({
     view: new ol.View({
         center: [0, 0],
         zoom: 21,
-        extent: [-100, -100, 100, 100],
-        minZoom: 20,
+        extent: [-1000, -1000, 1000, 1000],
+        minZoom: 18,
         maxZoom: 24
     })
 });

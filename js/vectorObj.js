@@ -48,9 +48,9 @@ Drutes.curveCollect = new function() {
 }();
 
 Drutes.curveObj = function(a, b) {
-
+// vertex a
     this.a = a;
-
+//vertex b
     this.b = b;
     
     this.property = {};
@@ -98,6 +98,8 @@ Drutes.vertexObj = function(x, y) {
     this.x = x;
 
     this.y = y;
+    
+    this.property = {};
 
     this.isIn = function(x, y) {
         for (var i = 0; i < Drutes.vertexCollect.collect.length; i++) {

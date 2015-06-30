@@ -8,11 +8,11 @@
         <meta name="country" content="cz" />
         <meta http-equiv="content-language" content="cs" />
 
-        <link rel="stylesheet" href="./lib/OL_3.5.0/css/ol.css" type="text/javascript">
+        <link rel="stylesheet" href="./lib/OL_3.6.0/css/ol.css" type="text/javascript">
 
         <link rel="stylesheet" href="./lib/bootstrap3_3_2/css/bootstrap.min.css">
 
-        <script src="./lib/OL_3.5.0/build/ol.js" type="text/javascript"></script>
+        <script src="./lib/OL_3.6.0/build/ol.js" type="text/javascript"></script>
 
         <script src="http://cdnjs.cloudflare.com/ajax/libs/proj4js/2.2.1/proj4.js" type="text/javascript"></script>
 
@@ -39,7 +39,7 @@
     <body>  
         <nav class="navbar navbar-default">
             <div class="container-fluid">
-                <div id="naviCont">
+                <div id="naviCont" class="inline">
 
                 </div>
             </div>
@@ -98,8 +98,8 @@
                 new Drutes.makeCurveProperty('selectedFeature').renderTo('editProperty');
 
                 new Drutes.makeConfigMesh('config maker').renderTo('naviCont');
-                new Drutes.makeConfigMesh('Save feature').renderTo('naviCont');
-                new Drutes.makeConfigMesh('Load feature').renderTo('naviCont');
+                new Drutes.saveFeatures('Save features as:').renderTo('naviCont');
+                new Drutes.loadFeatures('Load features').renderTo('naviCont');
                 new Drutes.importComp().renderTo('import');
             });
         </script>

@@ -13,7 +13,7 @@ Drutes.pathLayer = new ol.layer.Vector({
 });
 
 Drutes.curveLayer = new ol.layer.Vector({
-    title: "Path",
+    title: "Curve",
     source: new ol.source.Vector(),
     style: new ol.style.Style({
         stroke: new ol.style.Stroke({

@@ -1,4 +1,4 @@
-Drutes.makeCurveProperty = function(depoId) {
+Drutes.makeCurveProperty = function (depoId) {
 
     this.depo = depoId;
 
@@ -20,14 +20,18 @@ Drutes.makeCurveProperty = function(depoId) {
 
     var this_ = this;
 
-    this.buttonProperty.onclick = function() {
+    this.buttonProperty.onclick = function () {
 
-        this_.selectEvent.getFeatures().forEach(function(feature) {
+        this_.selectEvent.getFeatures().forEach(function (feature) {
 
             property = feature.get('property');
             property[this.inputName.value] = this.inputValue.value;
             Drutes.curveCollect.get(feature.get('idCurve')).property = property;
-            
+
+            curve = Drutes.curveCollect.get(feature.get('idCurve'));
+            curve.a.property = property;
+            curve.b.property = property;
+            console.log(curve);
             this.renderProperty(feature.get('idCurve'), feature.get('property'));
         }, this_);
     };
@@ -38,9 +42,9 @@ Drutes.makeCurveProperty = function(depoId) {
 
     this.buttonDelete.className = this.buttonClass;
 
-    this.buttonDelete.onclick = function() {
+    this.buttonDelete.onclick = function () {
 
-        this_.selectEvent.getFeatures().forEach(function(feature) {
+        this_.selectEvent.getFeatures().forEach(function (feature) {
             feature.setProperties({property: {}});
             Drutes.curveCollect.get(feature.get('idCurve')).property = {};
             this.renderProperty(feature.get('idCurve'), feature.get('property'));
@@ -48,8 +52,7 @@ Drutes.makeCurveProperty = function(depoId) {
     };
 
 
-    this.renderProperty = function(id, obj) {
-
+    this.renderProperty = function (id, obj) {
         $("#" + this.depo).empty();
         $("#" + this.depo).append("idCurve: " + id + "<br>");
         for (key in obj) {
@@ -57,31 +60,50 @@ Drutes.makeCurveProperty = function(depoId) {
         }
     }
 
-    this.selectEvent = new ol.interaction.Select({layers: [Drutes.curveLayer]});
+    this.dragBox = new ol.interaction.DragBox({
+        condition: ol.events.condition.shiftKeyOnly,
+        style: new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: [0, 0, 255, 1]
+            })
+        })
+    });
+
+    this.dragBox.on('boxend', function (e) {
+        extent = this_.dragBox.getGeometry().getExtent();
+        Drutes.curveLayer.getSource().forEachFeatureIntersectingExtent(extent, function (feature) {
+            this_.selectEvent.getFeatures().push(feature);
+        });
+    });
+    
+    Drutes.map.addInteraction(this.dragBox);
+
+    this.selectEvent = new ol.interaction.Select({
+        layers: [Drutes.curveLayer]
+    });
     this.selectEvent.setActive(false);
     Drutes.map.addInteraction(this.selectEvent);
 
-    this.selectEvent.on('select', function(e) {
-        e.target.getFeatures().forEach(function(feature) {
-
+    this.selectEvent.on('select', function (e) {
+        e.target.getFeatures().forEach(function (feature) {
             this.renderProperty(feature.get('idCurve'), feature.get('property'));
         }, this_);
     });
 
-    this.activate = function() {
+    this.activate = function () {
         this.buttonSelect.className = this.buttonClass + " active";
         this.selectEvent.setActive(true);
     }
 
-    this.deactivate = function() {
+    this.deactivate = function () {
         this.selectEvent.setActive(false);
         this.selectEvent.getFeatures().clear();
         this.buttonSelect.className = this.buttonClass;
         $("#" + this.depo).empty();
     }
 
-    this.buttonSelect.onclick = function(obj) {
-        return function() {
+    this.buttonSelect.onclick = function (obj) {
+        return function () {
             if (obj.buttonSelect.className == obj.buttonClass) {
                 obj.activate();
             } else {
@@ -102,7 +124,6 @@ Drutes.makeCurveProperty = function(depoId) {
     this.inputValue.type = "number";
     this.inputValue.placeholder = "value";
 
-
     var wrapper = document.createElement('fieldset');
     wrapperLegend = document.createElement('legend');
     wrapperLegend.innerHTML = "Create path: ";
@@ -112,7 +133,6 @@ Drutes.makeCurveProperty = function(depoId) {
     wrapperLegend = document.createElement('legend');
     wrapperLegend.innerHTML = "Set curve property: ";
     this.container.appendChild(wrapperLegend);
-    ;
 
 
     wrapInputName = document.createElement('div');
@@ -129,14 +149,17 @@ Drutes.makeCurveProperty = function(depoId) {
     this.container.appendChild(this.buttonSelect);
     this.container.appendChild(this.buttonProperty);
     this.container.appendChild(this.buttonDelete);
+    info = document.createElement('div');
+    info.innerHTML = "Hold shift key for multiple select (click or drag).";
+    this.container.appendChild(info);
 
-    this.renderTo = function(id) {
+    this.renderTo = function (id) {
 
         document.getElementById(id).appendChild(this.container);
     }
 }
 
-Drutes.makePathProperty = function(depoId) {
+Drutes.makePathProperty = function (depoId) {
 
     this.depo = depoId;
 
@@ -158,14 +181,14 @@ Drutes.makePathProperty = function(depoId) {
 
     var this_ = this;
 
-    this.buttonProperty.onclick = function() {
+    this.buttonProperty.onclick = function () {
 
-        this_.selectEvent.getFeatures().forEach(function(feature) {
+        this_.selectEvent.getFeatures().forEach(function (feature) {
 
             property = feature.get('property');
-            property[this.inputName.value] = this.inputValue.value;            
+            property[this.inputName.value] = this.inputValue.value;
             Drutes.pathCollect.get(feature.get('idPath')).property = property;
-            
+
             this.renderProperty(feature.get('idPath'), feature.get('property'));
         }, this_);
     };
@@ -176,16 +199,16 @@ Drutes.makePathProperty = function(depoId) {
 
     this.buttonDelete.className = this.buttonClass;
 
-    this.buttonDelete.onclick = function() {
+    this.buttonDelete.onclick = function () {
 
-        this_.selectEvent.getFeatures().forEach(function(feature) {
+        this_.selectEvent.getFeatures().forEach(function (feature) {
             feature.setProperties({property: {}});
             Drutes.pathCollect.get(feature.get('idPath')).property = {};
             this.renderProperty(feature.get('idPath'), feature.get('property'));
         }, this_);
     };
 
-    this.renderProperty = function(id, obj) {
+    this.renderProperty = function (id, obj) {
 
         $("#" + this.depo).empty();
         $("#" + this.depo).append("idPath: " + id + "<br>");
@@ -198,27 +221,27 @@ Drutes.makePathProperty = function(depoId) {
     this.selectEvent.setActive(false);
     Drutes.map.addInteraction(this.selectEvent);
 
-    this.selectEvent.on('select', function(e) {
-        e.target.getFeatures().forEach(function(feature) {
+    this.selectEvent.on('select', function (e) {
+        e.target.getFeatures().forEach(function (feature) {
 
             this.renderProperty(feature.get('idPath'), feature.get('property'));
         }, this_);
     });
 
-    this.activate = function() {
+    this.activate = function () {
         this.buttonSelect.className = this.buttonClass + " active";
         this.selectEvent.setActive(true);
     }
 
-    this.deactivate = function() {
+    this.deactivate = function () {
         this.selectEvent.setActive(false);
         this.selectEvent.getFeatures().clear();
         this.buttonSelect.className = this.buttonClass;
         $("#" + this.depo).empty();
     }
 
-    this.buttonSelect.onclick = function(obj) {
-        return function() {
+    this.buttonSelect.onclick = function (obj) {
+        return function () {
             if (obj.buttonSelect.className == obj.buttonClass) {
                 obj.activate();
             } else {
@@ -266,8 +289,8 @@ Drutes.makePathProperty = function(depoId) {
     this.container.appendChild(this.buttonSelect);
     this.container.appendChild(this.buttonProperty);
     this.container.appendChild(this.buttonDelete);
-    
-    this.renderTo = function(id) {
+
+    this.renderTo = function (id) {
 
         document.getElementById(id).appendChild(this.container);
     }

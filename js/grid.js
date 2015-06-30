@@ -1,16 +1,16 @@
 lineGrid = new Array();
-for (i = -200; i < 200; i = i + 10) {
+for (i = -2000; i < 2000; i = i + 25) {
     lineGrid.push(new ol.Feature({
         geometry: new ol.geom.LineString([
-            [-200, i],
-            [200, i]
+            [-2000, i],
+            [2000, i]
         ]
                 )
     }));
     lineGrid.push(new ol.Feature({
         geometry: new ol.geom.LineString([
-            [i, -200],
-            [i, 200]
+            [i, -2000],
+            [i, 2000]
         ]
                 )
     }));
